@@ -10,7 +10,7 @@ function keydownHandler(e) {
     if (e.key === '<' && video.playbackRate > 0) video.playbackRate -= 0.5
 
     let d = document.getElementById('playbackRate')
-    d.innerHTML = video.playbackRate + 'x'
+    d.textContent = `${video.playbackRate.toString()}x`
     d.classList.add('active')
     clearTimeout(dTimeout)
     dTimeout = setTimeout(() => d.classList.remove('active'), 500)
