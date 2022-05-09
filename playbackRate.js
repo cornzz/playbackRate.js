@@ -1,24 +1,33 @@
-let dTimeout = null
+let indicatorTimeout = null
+let allVideos = []
+
+function changePlaybackRate(e, video) {
+    if (e.key === '>') video.playbackRate += 0.5
+    if (e.key === '<' && video.playbackRate > 0) video.playbackRate -= 0.5
+
+    let indicator = video.parentNode.querySelector('.playbackRate')
+    indicator.textContent = `${video.playbackRate.toString()}x`
+    indicator.classList.add('active')
+    clearTimeout(indicatorTimeout)
+    indicatorTimeout = setTimeout(() => indicator.classList.remove('active'), 500)
+}
 
 function keydownHandler(e) {
     if (e.key !== '>' && e.key !== '<') {
         return
     }
 
-    let video = document.querySelector('video')
-    if (e.key === '>') video.playbackRate += 0.5
-    if (e.key === '<' && video.playbackRate > 0) video.playbackRate -= 0.5
-
-    let d = document.getElementById('playbackRate')
-    d.textContent = `${video.playbackRate.toString()}x`
-    d.classList.add('active')
-    clearTimeout(dTimeout)
-    dTimeout = setTimeout(() => d.classList.remove('active'), 500)
+    let videos = document.querySelectorAll('video')
+    if (videos.length > 1 && document.activeElement.tagName === 'VIDEO') {
+        changePlaybackRate(e, document.activeElement)
+    } else if (videos.length === 1) {
+        changePlaybackRate(e, videos[0])
+    }
 }
 
 function init() {
-    let video = document.querySelector('video')
-    if (!video) {
+    let videos = document.querySelectorAll('video:not(.playbackRateInit)')
+    if (!videos.length) {
         return
     }
     console.log('loaded playbackRate.js...')
@@ -26,7 +35,7 @@ function init() {
     var style = document.createElement('style')
     style.type = 'text/css'
     style.innerHTML = `
-        #playbackRate {
+        .playbackRate {
             height: 50px;
             width: 50px;
             position: absolute;
@@ -46,27 +55,27 @@ function init() {
             font-family: Arial, sans-serif;
             font-size: 15px;
         }
-        #playbackRate.active {
+        .playbackRate.active {
             opacity: 1 !important;
             transition: all 0.05s ease !important
         }
     `
     document.getElementsByTagName('head')[0].appendChild(style)
 
-    let d = document.createElement('div')
-    d.id = 'playbackRate'    
-    video.parentNode.appendChild(d)
-    
+    let indicator = document.createElement('div')
+    indicator.classList.add('playbackRate')
+    videos.forEach(v => {
+        v.parentNode.appendChild(indicator.cloneNode())
+        v.classList.add('playbackRateInit')
+    })
+
     document.addEventListener('keydown', keydownHandler)
 }
 
-const observer = new MutationObserver(function() {
-    let videos = document.getElementsByTagName('video')
-    if (videos.length > 0) {
-        this.disconnect()
-        init()
-    }
-})
 if (!/.*(\/|\.)youtube\..*/.test(window.location.toString())) {
-    observer.observe(document, { childList: true, subtree: true })
+    init()
+    new MutationObserver(() => {
+        if (document.getElementsByTagName('video').length)
+            init()
+    }).observe(document, { childList: true, subtree: true })
 }
