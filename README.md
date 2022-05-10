@@ -4,4 +4,5 @@ This little browser extension searches every website you visit (except YouTube) 
 
 # How to use
 
-playbackRate.js can be downloaded from the [releases page](https://github.com/cornzz/playbackRate.js/releases) and installed manually.
+playbackRate.js can be downloaded from the [releases 
+page](https://github.com/cornzz/playbackRate.js/releases) and installed manually. Firefox users can install it from [the addons for firefox website](https://addons.mozilla.org/en-US/firefox/addon/playbackrate-js/).
